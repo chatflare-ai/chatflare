@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+/* 
+@layer base {
+  :root {
+      --card-padding: theme("spacing[6]");
+      --accordion-padding: theme("spacing[4]");
+      --feedback-padding: var(--card-padding);
+      --toast-padding: theme("spacing[4]");
+  }
+}
+
+@layer base {
+  :root {
+      --display-text-color: theme(colors.gray.950);
+      --title-text-color: var(--display-text-color);
+      --caption-text-color: theme(colors.gray.500);
+      --body-text-color: theme(colors.gray.700);
+      --placeholder-text-color: theme(colors.gray.400);
+  }
+} */
