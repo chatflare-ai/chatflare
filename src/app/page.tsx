@@ -1,5 +1,5 @@
 import { ThemeToggle } from "@/components/theme-toggle";
-import Button from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { auth, signIn, signOut } from "@/server/auth";
 import { db } from "@/server/db";
 import { users } from "@/server/db/schema";
@@ -47,9 +47,9 @@ export default async function Page() {
                   await signOut();
                 }}
               >
-                <Button.Root>
-                  <Button.Label>Sign out</Button.Label>
-                </Button.Root>
+                <Button>
+                  Sign out
+                </Button>
               </form>
             </div>
           ) : (
@@ -60,9 +60,9 @@ export default async function Page() {
                   await signIn("google");
                 }}
               >
-                <Button.Root size="lg">
-                  <Button.Label>Start Chatting</Button.Label>
-                </Button.Root>
+                <Button size="lg">
+                  Start Chatting
+                </Button>
               </form>
             </div>
           )}

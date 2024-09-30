@@ -1,223 +1,205 @@
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import React from "react";
-import { cloneElement } from "@/lib/utils";
+"use client"
+
+import * as React from "react"
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import {
-  menu,
-  menuSeparator as separator,
-  defaultMenuProps,
-  type MenuProps,
-  type MenuSeparatorProps as SeparatorProps,
-} from "@tailus/themer";
+  CheckIcon,
+  ChevronRightIcon,
+  DotFilledIcon,
+} from "@radix-ui/react-icons"
 
-const DropdownMenuRoot = DropdownMenuPrimitive.Root;
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
-const DropdownMenuLabel = DropdownMenuPrimitive.Label;
-const DropdownMenuCheckboxItem = DropdownMenuPrimitive.CheckboxItem;
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
-const DropdownMenuRadioItem = DropdownMenuPrimitive.RadioItem;
-const DropdownMenuItemIndicator = DropdownMenuPrimitive.ItemIndicator;
+import { cn } from "@/lib/utils"
 
-const MenuContext = React.createContext(defaultMenuProps);
+const DropdownMenu = DropdownMenuPrimitive.Root
 
-const DropdownMenuContent = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> &
-    MenuProps
->(({ className, variant, intent, mixed, fancy, ...props }, forwardedRef) => {
-  const {
-    variant: contextVariant,
-    intent: contextIntent,
-    mixed: contextMixed,
-    fancy: contextFancy,
-  } = React.useContext(MenuContext);
+const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
 
-  variant = variant || contextVariant || "soft";
-  intent = intent || contextIntent;
-  fancy = fancy || contextFancy;
-  mixed = mixed || contextMixed;
+const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
-  if (fancy && mixed) {
-    throw new Error("The fancy and mixed props cannot be used together.");
-  }
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal
 
-  const contextValues = { variant, intent, fancy, mixed };
-  const { content } = menu[variant]();
+const DropdownMenuSub = DropdownMenuPrimitive.Sub
 
-  return (
-    <MenuContext.Provider value={contextValues}>
-      <DropdownMenuPrimitive.Content
-        {...props}
-        ref={forwardedRef}
-        className={content({ mixed, fancy, intent, className })}
-      />
-    </MenuContext.Provider>
-  );
-});
-
-DropdownMenuContent.displayName = "DropdownMenuContent";
-
-const DropdownMenuArrow = DropdownMenuPrimitive.Arrow;
-
-const DropdownMenuItem = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & MenuProps
->(({ className, variant, intent, ...props }, forwardedRef) => {
-  const contextValues = React.useContext(MenuContext);
-
-  variant = variant || contextValues.variant || "soft";
-  intent = intent || contextValues.intent;
-
-  const { item } = menu[variant]({ intent });
-
-  return (
-    <DropdownMenuPrimitive.Item
-      {...props}
-      ref={forwardedRef}
-      className={item({ intent, className })}
-    />
-  );
-});
-
-DropdownMenuItem.displayName = "DropdownMenuItem";
-
-const DropdownMenuSeparator = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator> &
-    SeparatorProps
->(({ className, fancy, ...props }, forwardedRef) => {
-  const { fancy: contextVariant } = React.useContext(MenuContext);
-  fancy = fancy || contextVariant;
-
-  return (
-    <DropdownMenuPrimitive.Separator
-      {...props}
-      ref={forwardedRef}
-      className={separator({ fancy, className })}
-    />
-  );
-});
-
-DropdownMenuSeparator.displayName = "DropdownMenuSeparator";
-
-const DropdownMenuSub = DropdownMenuPrimitive.Sub;
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup
 
 const DropdownMenuSubTrigger = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> &
-    MenuProps
->(({ className, variant, intent, ...props }, forwardedRef) => {
-  const contextValues = React.useContext(MenuContext);
-  variant = variant || contextValues.variant || "soft";
-  intent = intent || contextValues.intent;
-
-  const { subTrigger } = menu[variant]({});
-
-  return (
-    <DropdownMenuPrimitive.SubTrigger
-      {...props}
-      ref={forwardedRef}
-      className={subTrigger({ intent, className })}
-    />
-  );
-});
-
-DropdownMenuSubTrigger.displayName = "DropdownMenuSubTrigger";
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+    inset?: boolean
+  }
+>(({ className, inset, children, ...props }, ref) => (
+  <DropdownMenuPrimitive.SubTrigger
+    ref={ref}
+    className={cn(
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <ChevronRightIcon className="ml-auto h-4 w-4" />
+  </DropdownMenuPrimitive.SubTrigger>
+))
+DropdownMenuSubTrigger.displayName =
+  DropdownMenuPrimitive.SubTrigger.displayName
 
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
-  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent> &
-    MenuProps
->(({ className, variant, intent, fancy, mixed, ...props }, forwardedRef) => {
-  const {
-    variant: contextVariant,
-    intent: contextIntent,
-    fancy: contextFancy,
-    mixed: contextMixed,
-  } = React.useContext(MenuContext);
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubContent>
+>(({ className, ...props }, ref) => (
+  <DropdownMenuPrimitive.SubContent
+    ref={ref}
+    className={cn(
+      "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+      className
+    )}
+    {...props}
+  />
+))
+DropdownMenuSubContent.displayName =
+  DropdownMenuPrimitive.SubContent.displayName
 
-  variant = variant || contextVariant || "soft";
-  intent = intent || contextIntent;
-  fancy = fancy || contextFancy;
-  mixed = mixed || contextMixed;
-  const { content } = menu[variant]({ intent });
-
-  if (fancy && mixed) {
-    throw new Error("The fancy and mixed props cannot be used together.");
-  }
-
-  return (
-    <DropdownMenuPrimitive.SubContent
+const DropdownMenuContent = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content>
+>(({ className, sideOffset = 4, ...props }, ref) => (
+  <DropdownMenuPrimitive.Portal>
+    <DropdownMenuPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
       {...props}
-      ref={forwardedRef}
-      className={content({ mixed, fancy, intent, className })}
     />
-  );
-});
+  </DropdownMenuPrimitive.Portal>
+))
+DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
-DropdownMenuSubContent.displayName = "DropdownMenuSubContent";
+const DropdownMenuItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    inset?: boolean
+  }
+>(({ className, inset, ...props }, ref) => (
+  <DropdownMenuPrimitive.Item
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  />
+))
+DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
 
-interface DropdownMenuIconProps extends MenuProps {
-  className?: string;
-  children?: React.ReactNode;
+const DropdownMenuCheckboxItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem>
+>(({ className, children, checked, ...props }, ref) => (
+  <DropdownMenuPrimitive.CheckboxItem
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    checked={checked}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <DropdownMenuPrimitive.ItemIndicator>
+        <CheckIcon className="h-4 w-4" />
+      </DropdownMenuPrimitive.ItemIndicator>
+    </span>
+    {children}
+  </DropdownMenuPrimitive.CheckboxItem>
+))
+DropdownMenuCheckboxItem.displayName =
+  DropdownMenuPrimitive.CheckboxItem.displayName
+
+const DropdownMenuRadioItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
+>(({ className, children, ...props }, ref) => (
+  <DropdownMenuPrimitive.RadioItem
+    ref={ref}
+    className={cn(
+      "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <DropdownMenuPrimitive.ItemIndicator>
+        <DotFilledIcon className="h-4 w-4 fill-current" />
+      </DropdownMenuPrimitive.ItemIndicator>
+    </span>
+    {children}
+  </DropdownMenuPrimitive.RadioItem>
+))
+DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
+
+const DropdownMenuLabel = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Label>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Label> & {
+    inset?: boolean
+  }
+>(({ className, inset, ...props }, ref) => (
+  <DropdownMenuPrimitive.Label
+    ref={ref}
+    className={cn(
+      "px-2 py-1.5 text-sm font-semibold",
+      inset && "pl-8",
+      className
+    )}
+    {...props}
+  />
+))
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
+
+const DropdownMenuSeparator = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Separator>
+>(({ className, ...props }, ref) => (
+  <DropdownMenuPrimitive.Separator
+    ref={ref}
+    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    {...props}
+  />
+))
+DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
+
+const DropdownMenuShortcut = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLSpanElement>) => {
+  return (
+    <span
+      className={cn("ml-auto text-xs tracking-widest opacity-60", className)}
+      {...props}
+    />
+  )
 }
-
-const DropdownMenuIcon = ({ className, children }: DropdownMenuIconProps) => {
-  const { icon } = menu.soft({});
-  return cloneElement(children as React.ReactElement, icon({ className }));
-};
-
-DropdownMenuIcon.displayName = "DropdownMenuIcon";
-
-const DropdownMenuRightIcon = React.forwardRef<
-  React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div"> & MenuProps
->(({ className, ...props }, forwardedRef) => {
-  const { icon } = menu.solid({});
-  return <div {...props} ref={forwardedRef} className={icon({ className })} />;
-});
-
-DropdownMenuRightIcon.displayName = "DropdownMenuRightIcon";
-
-export default {
-  Root: DropdownMenuRoot,
-  Trigger: DropdownMenuTrigger,
-  Portal: DropdownMenuPortal,
-  Content: DropdownMenuContent,
-  Arrow: DropdownMenuArrow,
-  Item: DropdownMenuItem,
-  Group: DropdownMenuGroup,
-  Label: DropdownMenuLabel,
-  CheckboxItem: DropdownMenuCheckboxItem,
-  RadioGroup: DropdownMenuRadioGroup,
-  RadioItem: DropdownMenuRadioItem,
-  ItemIndicator: DropdownMenuItemIndicator,
-  Separator: DropdownMenuSeparator,
-  Sub: DropdownMenuSub,
-  SubTrigger: DropdownMenuSubTrigger,
-  SubContent: DropdownMenuSubContent,
-  Icon: DropdownMenuIcon,
-  RightIcon: DropdownMenuRightIcon,
-};
+DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 
 export {
-  DropdownMenuRoot,
+  DropdownMenu,
   DropdownMenuTrigger,
-  DropdownMenuPortal,
   DropdownMenuContent,
-  DropdownMenuArrow,
   DropdownMenuItem,
-  DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuItemIndicator,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuGroup,
+  DropdownMenuPortal,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-  DropdownMenuIcon,
-  DropdownMenuRightIcon,
-};
+  DropdownMenuSubTrigger,
+  DropdownMenuRadioGroup,
+}

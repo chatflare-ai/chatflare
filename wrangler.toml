@@ -13,3 +13,7 @@ database_id = "c48e585b-f440-46b4-9f7a-8e3f59484d7f"
 
 [ai]
 binding = "AI"
+
+[[vectorize]]
+binding = "VECTORIZE"
+index_name = "flarechat-index"
