@@ -23,7 +23,7 @@ export default async function Page() {
       <div className="max-w-5xl w-full px-4 py-8">
         <nav className="flex justify-between items-center mb-12">
           <div className="flex items-center space-x-2">
-            <span className="text-3xl" role="img" aria-hidden="true">
+            <span className="text-3xl" aria-hidden="true">
               🔅
             </span>
             <span className="text-2xl font-bold">FlareChat</span>
@@ -69,8 +69,8 @@ export default async function Page() {
         </section>
 
         <section className="grid md:grid-cols-3 gap-8 mb-16">
-          {features.map((feature, index) => (
-            <div key={index} className="bg-card rounded-lg p-6 shadow-md">
+          {features.map((feature) => (
+            <div key={feature.title} className="bg-card rounded-lg p-6 shadow-md">
               <feature.icon className="w-6 h-6 text-primary mb-2" />
               <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
               <p className="text-muted-foreground">{feature.description}</p>
@@ -79,7 +79,6 @@ export default async function Page() {
         </section>
 
         <footer className="text-center text-sm text-muted-foreground">
-          <p>Join our growing community of {userCount[0]!.count} users!</p>
           <p>&copy; 2024 FlareChat. All rights reserved.</p>
         </footer>
       </div>

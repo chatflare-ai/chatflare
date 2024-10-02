@@ -10,15 +10,19 @@ export const env = createEnv({
     AUTH_URL: z.string(),
     AUTH_SECRET: z.string(),
     AUTH_GOOGLE_ID: z.string(),
-    AUTH_GOOGLE_SECRET: z.string()
+    AUTH_GOOGLE_SECRET: z.string(),
+    RESEND_EMAIL_SERVER: z.string(),
+    RESEND_EMAIL_PORT: z.string(),
+    RESEND_EMAIL_SERVER_USER: z.string(),
+    RESEND_EMAIL_SERVER_PASSWORD: z.string(),
+    RESEND_EMAIL_FROM: z.string(),
   },
   /*
    * Environment variables available on the client (and server).
    *
    * 💡 You'll get type errors if these are not prefixed with NEXT_PUBLIC_.
    */
-  client: {
-  },
+  client: {},
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
    * we need to manually destructure them to make sure all are included in bundle.
@@ -28,6 +32,11 @@ export const env = createEnv({
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_GOOGLE_ID: process.env.AUTH_GOOGLE_ID,
-    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET
+    AUTH_GOOGLE_SECRET: process.env.AUTH_GOOGLE_SECRET,
+    RESEND_EMAIL_SERVER: process.env.RESEND_EMAIL_SERVER,
+    RESEND_EMAIL_PORT: process.env.RESEND_EMAIL_PORT,
+    RESEND_EMAIL_SERVER_USER: process.env.RESEND_EMAIL_SERVER_USER,
+    RESEND_EMAIL_SERVER_PASSWORD: process.env.RESEND_EMAIL_SERVER_PASSWORD,
+    RESEND_EMAIL_FROM: process.env.RESEND_EMAIL_FROM,
   },
 });

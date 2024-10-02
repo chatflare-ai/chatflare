@@ -1,8 +1,11 @@
-import { integer, sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core"
-import { drizzle } from "drizzle-orm/libsql"
-import type { AdapterAccountType } from "next-auth/adapters"
-import { db } from "." 
- 
+import {
+  integer,
+  sqliteTable,
+  text,
+  primaryKey,
+} from "drizzle-orm/sqlite-core";
+import type { AdapterAccountType } from "next-auth/adapters";
+
 export const users = sqliteTable("user", {
   id: text("id")
     .primaryKey()
@@ -11,8 +14,8 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
-})
- 
+});
+
 export const accounts = sqliteTable(
   "account",
   {
@@ -35,16 +38,16 @@ export const accounts = sqliteTable(
       columns: [account.provider, account.providerAccountId],
     }),
   })
-)
- 
+);
+
 export const sessions = sqliteTable("session", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
-})
- 
+});
+
 export const verificationTokens = sqliteTable(
   "verificationToken",
   {
@@ -57,8 +60,8 @@ export const verificationTokens = sqliteTable(
       columns: [verificationToken.identifier, verificationToken.token],
     }),
   })
-)
- 
+);
+
 export const authenticators = sqliteTable(
   "authenticator",
   {
@@ -80,4 +83,68 @@ export const authenticators = sqliteTable(
       columns: [authenticator.userId, authenticator.credentialID],
     }),
   })
-)
+);
+
+export const teams = sqliteTable("team", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  defaultRole: text("defaultRole")
+    .notNull()
+    .$defaultFn(() => "member"),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const teamMembers = sqliteTable("teamMember", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  teamId: text("teamId")
+    .notNull()
+    .references(() => teams.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  role: text("role")
+    .notNull()
+    .$defaultFn(() => "member"),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const invites = sqliteTable("invite", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  email: text("email").notNull(),
+  role: text("role")
+    .notNull()
+    .$defaultFn(() => "member"),
+  token: text("token").notNull().unique(),
+  expiresAt: integer("expiresAt", { mode: "timestamp_ms" }).notNull(),
+  invitedBy: text("invitedBy")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  teamId: text("teamId")
+    .notNull()
+    .references(() => teams.id, { onDelete: "cascade" }),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Team = typeof teams.$inferSelect;
+export type NewTeam = typeof teams.$inferInsert;
