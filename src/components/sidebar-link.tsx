@@ -19,7 +19,7 @@ export function SidebarLink({
   label: string;
 }) {
   const pathname = usePathname();
-  const isActive = pathname.includes(href);
+  const isActive = pathname === href;
 
   return (
     <Tooltip>
