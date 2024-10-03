@@ -9,27 +9,27 @@ export type SidebarItem = {
 export const SIDEBAR_ITEMS: SidebarItem[] = [
   {
     name: "Overview",
-    href: "/overview",
+    href: "/dashboard",
     icon: "gauge",
   },
   {
-    name: "DataStore",
-    href: "/datastore",
+    name: "DataStores",
+    href: "/dashboard/datastores",
     icon: "database",
   },
   {
     name: "API",
-    href: "/api",
+    href: "/dashboard/api",
     icon: "code",
   },
   {
     name: "Documentation",
-    href: "/documentation",
+    href: "/dashboard/documentation",
     icon: "book",
   },
   {
     name: "Settings",
-    href: "/settings",
+    href: "/dashboard/settings",
     icon: "settings",
   },
 ];
