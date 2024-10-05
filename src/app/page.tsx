@@ -1,106 +1,50 @@
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { auth, signIn, signOut } from "@/server/auth";
-import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
-import { sql } from "drizzle-orm";
-import { Zap, MessageCircle, Globe } from "lucide-react";
-import { ChatBubble } from '@/components/ChatBubble';
+import { AnimatedText } from "@/components/animations/animated-text";
+import { Header } from "@/components/landing/header";
+import { CopyText } from "@/components/shared/copy-text";
+import { SiCloudflare, SiCloudflareHex } from "@icons-pack/react-simple-icons";
+import Link from "next/link";
 
 export const runtime = "edge";
 
 export default async function Page() {
-  const session = await auth();
-
-  const userCount = await db
-    .select({
-      count: sql<number>`count(*)`.mapWith(Number),
-    })
-    .from(users);
-
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-background via-primary/10 to-secondary/20">
-      <div className="max-w-5xl w-full px-4 py-8">
-        <nav className="flex justify-between items-center mb-12">
-          <div className="flex items-center space-x-2">
-            <span className="text-3xl" aria-hidden="true">
-              🔅
-            </span>
-            <span className="text-2xl font-bold">FlareChat</span>
+    <div>
+      <Header />
+      <div className="h-screen w-screen flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute -top-[118px] inset-0 bg-[linear-gradient(to_right,#222_1px,transparent_1px),linear-gradient(to_bottom,#222_1px,transparent_1px)] bg-[size:4.5rem_2rem] -z-10 [transform:perspective(1000px)_rotateX(-63deg)] h-[80%] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent pointer-events-none -z-10" />
+
+        <h1 className="font-departure text-[40px] md:text-[84px] relative z-10 text-center h-[120px] md:h-auto leading-tight">
+          <AnimatedText text="Fully Free AI Chatbot" />
+        </h1>
+
+        <p className="relative z-10 text-center max-w-[80%] mt-0 md:mt-4">
+          An open-source AI chatbot built on top of{" "}
+          <Link
+            href="https://cloudflare.com"
+            className="underline font-medium"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Cloudflare
+          </Link>
+          .
+        </p>
+
+        <div className="mt-10 mb-8">
+          <CopyText value="bunx degit chatflare-ai/chatflare chatflare" />
+        </div>
+
+        <Link href="https://chatflare.co" target="_blank" rel="noreferrer">
+          <div className="flex items-center gap-2">
+            <SiCloudflare className="h-4" color={SiCloudflareHex} />
+            <span className="text-sm">Hosted on Cloudflare</span>
           </div>
-          <ThemeToggle />
-        </nav>
+        </Link>
 
-        <section className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Welcome to FlareChat
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Experience lightning-fast, AI-powered conversations
-          </p>
-          {session?.user?.email ? (
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-lg">Welcome back, {session.user.name}! 👋</p>
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut();
-                }}
-              >
-                <Button>
-                  Sign out
-                </Button>
-              </form>
-            </div>
-          ) : (
-            <div className="flex justify-center">
-              <form
-                action={async () => {
-                  "use server";
-                  await signIn("google");
-                }}
-              >
-                <Button size="lg">
-                  Start Chatting
-                </Button>
-              </form>
-            </div>
-          )}
-        </section>
-
-        <section className="grid md:grid-cols-3 gap-8 mb-16">
-          {features.map((feature) => (
-            <div key={feature.title} className="bg-card rounded-lg p-6 shadow-md">
-              <feature.icon className="w-6 h-6 text-primary mb-2" />
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </div>
-          ))}
-        </section>
-
-        <footer className="text-center text-sm text-muted-foreground">
-          <p>&copy; 2024 FlareChat. All rights reserved.</p>
-        </footer>
+        <div className="absolute -bottom-[280px] inset-0 bg-[linear-gradient(to_right,#222_1px,transparent_1px),linear-gradient(to_bottom,#222_1px,transparent_1px)] bg-[size:4.5rem_2rem] -z-10 [transform:perspective(560px)_rotateX(63deg)] pointer-events-none" />
+        <div className="absolute w-full bottom-[100px] h-1/2  bg-gradient-to-b from-background to-transparent pointer-events-none -z-10" />
       </div>
-      <ChatBubble />
-    </main>
+    </div>
   );
 }
-
-const features = [
-  {
-    title: "AI-Powered Conversations",
-    description: "Engage in intelligent discussions with our advanced AI chatbot.",
-    icon: Zap,
-  },
-  {
-    title: "Real-Time Messaging",
-    description: "Experience seamless, instant communication with other users.",
-    icon: MessageCircle,
-  },
-  {
-    title: "Multi-Platform Support",
-    description: "Access FlareChat on web, mobile, and desktop for chat anywhere, anytime.",
-    icon: Globe,
-  },
-];

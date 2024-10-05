@@ -11,6 +11,8 @@ import { DocumentTypesChart } from "@/components/overview/document-types-chart";
 import { RecentActivity } from "@/components/overview/recent-activity";
 import { QuickActions } from "@/components/overview/quick-actions";
 
+export const runtime = "edge";
+
 export default function DashboardPage() {
   return (
     <DashboardSection>

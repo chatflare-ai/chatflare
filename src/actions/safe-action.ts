@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { getUser } from "@/server/auth";
+import { getUser } from "@/lib/auth";
 import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,

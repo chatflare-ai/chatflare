@@ -7,9 +7,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FlareChat",
+  title: "Chatflare",
   description:
-    "FlareChat is an AI chatbot built on Cloudflare's technology stack.",
+    "Chatflare is an AI chatbot built on Cloudflare's technology stack.",
 };
 
 export default function RootLayout({

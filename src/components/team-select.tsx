@@ -12,19 +12,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
+import type { Team } from "@/server/db/schema";
 
-const teams = [
-  { value: "engineering", label: "Engineering" },
-  { value: "marketing", label: "Marketing" },
-];
-
-export function TeamSelect() {
+export function TeamSelect({
+  teams,
+  defaultTeam,
+}: {
+  teams: Team[];
+  defaultTeam: string;
+}) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(defaultTeam);
   const [search, setSearch] = useState("");
 
   const filteredTeams = teams.filter((team) =>
-    team.label.toLowerCase().includes(search.toLowerCase()),
+    team.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -46,18 +48,16 @@ export function TeamSelect() {
         ) : (
           filteredTeams.map((team) => (
             <DropdownMenuItem
-              key={team.value}
+              key={team.id}
               onSelect={() => {
-                setValue(team.value === value ? "" : team.value);
+                setValue(team.id === value ? "" : team.id);
                 setOpen(false);
                 setSearch("");
               }}
             >
-              <GradientAvatar name={team.value} size="sm" className="mr-2" />
-              {team.label}
-              {value === team.value && (
-                <Icons.check className="size-4 ml-auto" />
-              )}
+              <GradientAvatar name={team.name} size="sm" className="mr-2" />
+              {team.name}
+              {value === team.id && <Icons.check className="size-4 ml-auto" />}
             </DropdownMenuItem>
           ))
         )}

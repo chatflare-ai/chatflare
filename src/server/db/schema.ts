@@ -1,8 +1,10 @@
+import { relations } from "drizzle-orm";
 import {
   integer,
   sqliteTable,
   text,
   primaryKey,
+  blob,
 } from "drizzle-orm/sqlite-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -14,6 +16,7 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
+  defaultTeamSlug: text("defaultTeamSlug").references(() => teams.slug),
 });
 
 export const accounts = sqliteTable(
@@ -91,6 +94,8 @@ export const teams = sqliteTable("team", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
+  dataStoreUsage: integer("dataStoreUsage").notNull().default(0),
+  dataStoreLimit: integer("dataStoreLimit").notNull().default(3),
   defaultRole: text("defaultRole")
     .notNull()
     .$defaultFn(() => "member"),
@@ -144,7 +149,85 @@ export const invites = sqliteTable("invite", {
     .$defaultFn(() => new Date()),
 });
 
+export const dataStores = sqliteTable("dataStore", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  teamSlug: text("teamSlug")
+    .notNull()
+    .references(() => teams.slug, { onDelete: "cascade" }),
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const dataSources = sqliteTable("dataSource", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  dataStoreId: text("dataStoreId")
+    .notNull()
+    .references(() => dataStores.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  config: blob("config", { mode: "json" }).notNull(),
+  status: text("status").notNull().$defaultFn(() => "pending"),
+
+  userId: text("userId")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  teamId: text("teamId")
+    .notNull()
+    .references(() => teams.id, { onDelete: "cascade" }),
+
+  createdAt: integer("createdAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updatedAt", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const userRelations = relations(users, ({ many }) => ({
+  teamMembers: many(teamMembers),
+}));
+
+export const teamRelations = relations(teams, ({ many }) => ({
+  teamMembers: many(teamMembers),
+  invites: many(invites),
+}));
+
+export const teamMemberRelations = relations(teamMembers, ({ one }) => ({
+  team: one(teams, {
+    fields: [teamMembers.teamId],
+    references: [teams.id],
+  }),
+  user: one(users, {
+    fields: [teamMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const inviteRelations = relations(invites, ({ one }) => ({
+  team: one(teams, {
+    fields: [invites.teamId],
+    references: [teams.id],
+  }),
+  invitedBy: one(users, {
+    fields: [invites.invitedBy],
+    references: [users.id],
+  }),
+}));
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;
+export type DataStore = typeof dataStores.$inferSelect;
+export type NewDataStore = typeof dataStores.$inferInsert;
+export type DataSource = typeof dataSources.$inferSelect;
+export type NewDataSource = typeof dataSources.$inferInsert;

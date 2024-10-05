@@ -13,7 +13,7 @@ export function Chat() {
         <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl">
           🔅
         </div>
-        <h2 className="ml-3 text-lg font-semibold">FlareChat</h2>
+        <h2 className="ml-3 text-lg font-semibold">Chatflare</h2>
       </div>
       <div className="h-[400px] overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (

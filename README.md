@@ -1,4 +1,4 @@
-# 🔅 FlareChat
+# 🔅 Chatflare
 
 **_Build your own AI chatbot on Cloudflare with ease._**
 
@@ -21,8 +21,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https:
 
 2. Clone the repository and install dependencies:
    ```bash
-   git clone https://github.com/FlareChatAI/flarechat
-   cd flarechat
+   git clone https://github.com/ChatflareAI/chatflare
+   cd chatflare
    npm i -g bun
    bun install
    bun run setup

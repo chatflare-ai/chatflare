@@ -27,11 +27,69 @@ CREATE TABLE `authenticator` (
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
+CREATE TABLE `dataSource` (
+	`id` text PRIMARY KEY NOT NULL,
+	`dataStoreId` text NOT NULL,
+	`type` text NOT NULL,
+	`config` blob NOT NULL,
+	`status` text NOT NULL,
+	`userId` text NOT NULL,
+	`teamId` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL,
+	FOREIGN KEY (`dataStoreId`) REFERENCES `dataStore`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`teamId`) REFERENCES `team`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `dataStore` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`slug` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `invite` (
+	`id` text PRIMARY KEY NOT NULL,
+	`email` text NOT NULL,
+	`role` text NOT NULL,
+	`token` text NOT NULL,
+	`expiresAt` integer NOT NULL,
+	`invitedBy` text NOT NULL,
+	`teamId` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	FOREIGN KEY (`invitedBy`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`teamId`) REFERENCES `team`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `session` (
 	`sessionToken` text PRIMARY KEY NOT NULL,
 	`userId` text NOT NULL,
 	`expires` integer NOT NULL,
 	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `teamMember` (
+	`id` text PRIMARY KEY NOT NULL,
+	`teamId` text NOT NULL,
+	`userId` text NOT NULL,
+	`role` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL,
+	FOREIGN KEY (`teamId`) REFERENCES `team`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `team` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`slug` text NOT NULL,
+	`dataStoreUsage` integer DEFAULT 0 NOT NULL,
+	`dataStoreLimit` integer DEFAULT 3 NOT NULL,
+	`defaultRole` text NOT NULL,
+	`createdAt` integer NOT NULL,
+	`updatedAt` integer NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `user` (
@@ -50,4 +108,7 @@ CREATE TABLE `verificationToken` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `authenticator_credentialID_unique` ON `authenticator` (`credentialID`);--> statement-breakpoint
+CREATE UNIQUE INDEX `dataStore_slug_unique` ON `dataStore` (`slug`);--> statement-breakpoint
+CREATE UNIQUE INDEX `invite_token_unique` ON `invite` (`token`);--> statement-breakpoint
+CREATE UNIQUE INDEX `team_slug_unique` ON `team` (`slug`);--> statement-breakpoint
 CREATE UNIQUE INDEX `user_email_unique` ON `user` (`email`);

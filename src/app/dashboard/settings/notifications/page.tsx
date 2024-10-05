@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 
+export const runtime = "edge";
+
 interface NotificationSetting {
   id: string;
   title: string;

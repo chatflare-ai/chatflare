@@ -3,5 +3,5 @@
 
 interface CloudflareEnv {
 	DATABASE: D1Database;
-	AI: any;
+	AI: Ai;
 }

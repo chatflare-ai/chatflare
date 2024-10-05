@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icons } from "@/components/icons";
 import { FadeInSection } from "@/components/animations/fade-in-section";
 
+export const runtime = "edge";
+
 function MembersList() {
   return (
     <div className="space-y-4">

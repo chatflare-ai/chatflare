@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "d19a2b6a-823d-4055-8de9-08ee277a8034",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "ef64bf29-4aba-4c17-997e-ded228bf896e",
+  "prevId": "d19a2b6a-823d-4055-8de9-08ee277a8034",
   "tables": {
     "account": {
       "name": "account",
@@ -705,6 +705,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "defaultTeamSlug": {
+          "name": "defaultTeamSlug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -716,7 +723,21 @@
           "isUnique": true
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "user_defaultTeamSlug_team_slug_fk": {
+          "name": "user_defaultTeamSlug_team_slug_fk",
+          "tableFrom": "user",
+          "tableTo": "team",
+          "columnsFrom": [
+            "defaultTeamSlug"
+          ],
+          "columnsTo": [
+            "slug"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

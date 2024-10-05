@@ -6,6 +6,8 @@ import {
 import { searchParamsCache } from "./searchParams";
 import type { Datastore } from "@/types/datastore";
 
+export const runtime = "edge";
+
 type PageProps = {
   searchParams: Record<string, string | string[] | undefined>;
 };

@@ -11,6 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 
+export const runtime = "edge";
+
 export default function GeneralSettingsPage() {
   return (
     <FadeInSection className="grid gap-6">

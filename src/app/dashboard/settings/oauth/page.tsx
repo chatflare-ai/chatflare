@@ -18,6 +18,8 @@ import {
 } from "@icons-pack/react-simple-icons";
 import { FadeInSection } from "@/components/animations/fade-in-section";
 
+export const runtime = "edge";
+
 interface OAuthApp {
   id: string;
   name: string;

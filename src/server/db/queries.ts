@@ -1,37 +1,50 @@
 import { db } from "@/server/db";
-import { users } from "@/server/db/schema";
-import { verifyToken } from "@/server/session";
-import { cookies } from "next/headers";
-import { and, eq, isNull } from "drizzle-orm";
+import { dataStores, NewDataStore, teamMembers, teams, users } from "@/server/db/schema";
+import { eq } from "drizzle-orm";
 
-export async function getUser() {
-  const sessionCookie = cookies().get("session");
-  if (!sessionCookie || !sessionCookie.value) {
-    return null;
-  }
+export async function getTeamsByUser(userId: string) {
+  const result = await db.query.teamMembers.findMany({
+    where: eq(teamMembers.userId, userId),
+    with: {
+      team: true,
+    },
+  });
 
-  const sessionData = await verifyToken(sessionCookie.value);
-  if (
-    !sessionData ||
-    !sessionData.user ||
-    typeof sessionData.user.id !== "number"
-  ) {
-    return null;
-  }
+  return result.map((team) => team.team);
+}
 
-  if (new Date(sessionData.expires) < new Date()) {
-    return null;
-  }
+export async function getUserById(userId: string) {
+  const result = await db.select().from(users).where(eq(users.id, userId));
 
-  const user = await db
+  return result[0];
+}
+
+export async function getTeamBySlug(slug: string) {
+  const result = await db.select().from(teams).where(eq(teams.slug, slug));
+
+  return result[0];
+}
+
+export async function getDataStoresByTeam(teamSlug: string) {
+  const result = await db
     .select()
-    .from(users)
-    .where(and(eq(users.id, sessionData.user.id)))
-    .limit(1);
+    .from(dataStores)
+    .where(eq(dataStores.teamSlug, teamSlug));
 
-  if (user.length === 0) {
-    return null;
-  }
+  return result;
+}
 
-  return user[0];
+export async function getDataStoreBySlug(slug: string) {
+  const result = await db
+    .select()
+    .from(dataStores)
+    .where(eq(dataStores.slug, slug));
+
+  return result[0];
+}
+
+export async function createDataStore(dataStore: NewDataStore) {
+  const result = await db.insert(dataStores).values(dataStore).returning();
+
+  return result[0];
 }

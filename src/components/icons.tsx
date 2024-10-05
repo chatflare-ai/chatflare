@@ -13,13 +13,13 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Circle,
   Code,
   Copy,
   CreditCard,
   Crosshair,
   Database,
   DatabaseZap,
+  Diamond,
   Dog,
   ExternalLink,
   File,
@@ -63,13 +63,13 @@ import {
   User,
   Users,
   Webhook,
-  X,
+  X
 } from "lucide-react";
 
 export type Icon = LucideIcon;
 
 export const Icons = {
-  logo: Circle,
+  logo: Diamond,
   workspace: Building2,
   add: Plus,
   bell: Bell,
