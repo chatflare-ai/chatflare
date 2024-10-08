@@ -33,3 +33,14 @@ export const SIDEBAR_ITEMS: SidebarItem[] = [
     icon: "settings",
   },
 ];
+
+export const siteConfig = {
+  title: "Chatflare",
+  description: "Chatflare is a chatbot platform that allows you to create your own chatbots.",
+  url: "https://chatflare.cloud",
+  ogImage: "https://chatflare.cloud/og.png",
+  links: {
+    twitter: "https://twitter.com/chatflare",
+    github: "https://github.com/chatflareai",
+  },
+};

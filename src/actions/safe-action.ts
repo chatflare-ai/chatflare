@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { getUser } from "@/lib/auth";
+import { getUser } from "@/server/db/queries";
 import {
   createSafeActionClient,
   DEFAULT_SERVER_ERROR_MESSAGE,
@@ -7,6 +7,8 @@ import {
 import { z } from "zod";
 import * as Sentry from "@sentry/nextjs";
 import { db } from "@/server/db";
+import { headers } from "next/headers";
+import { ratelimit } from "@/lib/kv";
 
 export const actionClient = createSafeActionClient({
   handleServerError: (error) => {
@@ -46,6 +48,25 @@ export const authActionClient = actionClientWithMeta
     }
 
     return result;
+  })
+  .use(async ({ next, metadata }) => {
+    const ip = headers().get("x-forwarded-for");
+
+    const { success, remaining } = await ratelimit.limit(
+      `${ip}-${metadata.name}`
+    );
+
+    if (!success) {
+      throw new Error("Too many requests");
+    }
+
+    return next({
+      ctx: {
+        ratelimit: {
+          remaining,
+        },
+      },
+    });
   })
   .use(async ({ next, metadata }) => {
     const user = await getUser();

@@ -6,8 +6,13 @@ import { Icons } from "@/components/icons";
 import { auth, signIn } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { siteConfig } from "@/lib/config";
 
 export const runtime = "edge";
+
+export const metadata = {
+  title: `Sign in | ${siteConfig.title}`,
+};
 
 export default async function SignInPage() {
   const session = await auth();

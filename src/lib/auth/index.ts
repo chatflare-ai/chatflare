@@ -4,7 +4,6 @@ import NextAuth from "next-auth";
 import { db } from "@/server/db";
 import authConfig from "./auth.config";
 import { eq } from "drizzle-orm";
-import { getUserById } from "@/server/db/queries";
 
 export const {
   handlers: { GET, POST },
@@ -32,21 +31,10 @@ export const {
         });
         await db
           .update(users)
-          .set({ defaultTeamSlug: team[0].insertedId })
+          .set({ teamId: team[0].insertedId })
           .where(eq(users.id, user.id!));
       }
     },
   },
   ...authConfig,
 });
-
-export const getUser = async (): Promise<User | null> => {
-  const session = await auth();
-
-  if (!session?.user) {
-    return null;
-  }
-
-  const user = await getUserById(session.user.id!);
-  return user;
-};

@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import type { Team } from "@/server/db/schema";
+import { redirect } from "next/navigation";
 
 export function TeamSelect({
   teams,
@@ -22,7 +23,6 @@ export function TeamSelect({
   defaultTeam: string;
 }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(defaultTeam);
   const [search, setSearch] = useState("");
 
   const filteredTeams = teams.filter((team) =>
@@ -33,7 +33,7 @@ export function TeamSelect({
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <GradientAvatar name={value} size="sm" />
+          <GradientAvatar name={defaultTeam} size="sm" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[200px] p-2">
@@ -50,14 +50,16 @@ export function TeamSelect({
             <DropdownMenuItem
               key={team.id}
               onSelect={() => {
-                setValue(team.id === value ? "" : team.id);
                 setOpen(false);
                 setSearch("");
+                redirect(`/dashboard/${team.slug}`);
               }}
             >
               <GradientAvatar name={team.name} size="sm" className="mr-2" />
               {team.name}
-              {value === team.id && <Icons.check className="size-4 ml-auto" />}
+              {team.slug === defaultTeam && (
+                <Icons.check className="size-4 ml-auto" />
+              )}
             </DropdownMenuItem>
           ))
         )}

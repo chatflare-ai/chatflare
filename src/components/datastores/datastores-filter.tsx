@@ -1,10 +1,13 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { useQueryState } from "nuqs";
+import { parseAsString, useQueryState } from "nuqs";
 
 export function DatastoresFilter() {
-  const [filter, setFilter] = useQueryState("filter", { defaultValue: "" });
+  const [filter, setFilter] = useQueryState(
+    "filter",
+    parseAsString.withOptions({ shallow: false }).withDefault(""),
+  );
 
   return (
     <Input

@@ -46,8 +46,11 @@ CREATE TABLE `dataStore` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name` text NOT NULL,
 	`slug` text NOT NULL,
+	`description` text,
+	`teamId` text NOT NULL,
 	`createdAt` integer NOT NULL,
-	`updatedAt` integer NOT NULL
+	`updatedAt` integer NOT NULL,
+	FOREIGN KEY (`teamId`) REFERENCES `team`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `invite` (
@@ -97,7 +100,8 @@ CREATE TABLE `user` (
 	`name` text,
 	`email` text,
 	`emailVerified` integer,
-	`image` text
+	`image` text,
+	`teamId` text
 );
 --> statement-breakpoint
 CREATE TABLE `verificationToken` (

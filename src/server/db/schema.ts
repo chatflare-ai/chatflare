@@ -16,7 +16,7 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
-  defaultTeamSlug: text("defaultTeamSlug").references(() => teams.slug),
+  teamId: text("teamId")
 });
 
 export const accounts = sqliteTable(
@@ -155,9 +155,10 @@ export const dataStores = sqliteTable("dataStore", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
-  teamSlug: text("teamSlug")
+  description: text("description"),
+  teamId: text("teamId")
     .notNull()
-    .references(() => teams.slug, { onDelete: "cascade" }),
+    .references(() => teams.id, { onDelete: "cascade" }),
   createdAt: integer("createdAt", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -175,7 +176,9 @@ export const dataSources = sqliteTable("dataSource", {
     .references(() => dataStores.id, { onDelete: "cascade" }),
   type: text("type").notNull(),
   config: blob("config", { mode: "json" }).notNull(),
-  status: text("status").notNull().$defaultFn(() => "pending"),
+  status: text("status")
+    .notNull()
+    .$defaultFn(() => "pending"),
 
   userId: text("userId")
     .notNull()
@@ -227,7 +230,8 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;
-export type DataStore = typeof dataStores.$inferSelect;
-export type NewDataStore = typeof dataStores.$inferInsert;
-export type DataSource = typeof dataSources.$inferSelect;
-export type NewDataSource = typeof dataSources.$inferInsert;
+export type Datastore = typeof dataStores.$inferSelect;
+export type NewDatastore = typeof dataStores.$inferInsert;
+export type UpdateDatastore = Partial<Datastore>;
+export type Datasource = typeof dataSources.$inferSelect;
+export type NewDatasource = typeof dataSources.$inferInsert;

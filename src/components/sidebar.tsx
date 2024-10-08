@@ -1,7 +1,7 @@
 import { Icon, Icons } from "@/components/icons";
 import { SidebarLink } from "@/components/sidebar-link";
 import { TeamSelect } from "@/components/team-select";
-import { getUser } from "@/lib/auth";
+import { getUser } from "@/server/db/queries";
 import { SIDEBAR_ITEMS } from "@/lib/config";
 import { getTeamsByUser } from "@/server/db/queries";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export async function Sidebar() {
         ))}
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
-        <TeamSelect defaultTeam={user.defaultTeamSlug!} teams={teams} />
+        <TeamSelect defaultTeam={user.teamId!} teams={teams} />
       </nav>
     </aside>
   );

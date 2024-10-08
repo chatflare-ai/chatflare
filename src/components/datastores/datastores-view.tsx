@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useQueryState } from 'nuqs'
-import { DatastoresList } from './datastores-list'
-import { DatastoresGrid } from './datastores-grid'
-import { DatastoresFilter } from './datastores-filter'
-import { ViewToggle } from './view-toggle'
-import type { Datastore } from '@/types/datastore'
+import { useQueryState } from "nuqs";
+import { DatastoresList } from "./datastores-list";
+import { DatastoresGrid } from "./datastores-grid";
+import { DatastoresFilter } from "./datastores-filter";
+import { ViewToggle } from "./view-toggle";
+import type { Datastore } from "@/server/db/schema";
 
 export function DatastoresView({ datastores }: { datastores: Datastore[] }) {
-  const [view, setView] = useQueryState('view', { defaultValue: 'grid' })
+  const [view, setView] = useQueryState("view", { defaultValue: "grid" });
 
   return (
     <div>
@@ -22,5 +22,5 @@ export function DatastoresView({ datastores }: { datastores: Datastore[] }) {
         <DatastoresGrid datastores={datastores} />
       )}
     </div>
-  )
+  );
 }

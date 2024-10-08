@@ -4,7 +4,8 @@ import {
   DashboardSectionHeader,
 } from "@/components/shared/section";
 import { searchParamsCache } from "./searchParams";
-import type { Datastore } from "@/types/datastore";
+import { AddEditDatastore } from "@/app/dashboard/datastores/_components/add-edit-datastore";
+import { getDatastoresByTeam } from "@/server/db/queries";
 
 export const runtime = "edge";
 
@@ -12,40 +13,16 @@ type PageProps = {
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-async function fetchDatastores({ q }: { q: string }): Promise<Datastore[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: "1",
-          name: "Datastore 1",
-          description: "Description 1",
-        },
-        {
-          id: "2",
-          name: "Datastore 2",
-          description: "Description 2",
-        },
-        {
-          id: "3",
-          name: "Datastore 3",
-          description: "Description 3",
-        },
-      ]);
-    }, 1000);
-  });
-}
-
 export default async function DatastoresPage({ searchParams }: PageProps) {
-  const { q } = searchParamsCache.parse(searchParams);
+  const { filter } = searchParamsCache.parse(searchParams);
 
-  const datastores = await fetchDatastores({
-    q,
-  });
+  const datastores = await getDatastoresByTeam(filter);
 
   return (
     <DashboardSection>
-      <DashboardSectionHeader title="Datastores" />
+      <DashboardSectionHeader title="Datastores">
+        <AddEditDatastore />
+      </DashboardSectionHeader>
       <DatastoresView datastores={datastores} />
     </DashboardSection>
   );
