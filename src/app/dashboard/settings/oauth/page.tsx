@@ -17,6 +17,7 @@ import {
   type IconType,
 } from "@icons-pack/react-simple-icons";
 import { FadeInSection } from "@/components/animations/fade-in-section";
+import connectOAuth from "@/lib/documents/sign-in";
 
 export const runtime = "edge";
 
@@ -78,9 +79,15 @@ function OAuthAppCard({ app }: { app: OAuthApp }) {
             console.log(`Toggled ${app.name} connection`);
           }}
         />
-        <Button variant={app.connected ? "outline" : "default"}>
-          {app.connected ? "Manage" : "Connect"}
-        </Button>
+        {app.connected ? (
+          <Button variant="outline">Manage</Button>
+        ) : (
+          <form action={async () => connectOAuth(app.id)}>
+            <Button variant="default" type="submit">
+              Connect
+            </Button>
+          </form>
+        )}
       </CardFooter>
     </Card>
   );
