@@ -4,17 +4,28 @@ import {
   DatabaseObjectResponse,
   SearchResponse,
   GetPageResponse,
+  ListBlockChildrenResponse,
+  BlockObjectResponse,
+  PartialBlockObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
 interface NotionClient {
-  // get pages from notion
+  // get all documents from notion
   allDocuments(): Promise<SearchResponse>;
   // get all pages
   allPages(): Promise<PageObjectResponse[]>;
   // get all databases
   allDatabases(): Promise<DatabaseObjectResponse[]>;
   // get page details
-  pageDetails(pageId: string): Promise<GetPageResponse>;
+  pageDetails(pageId: string): Promise<ListBlockChildrenResponse>;
+
+  // retrieve children blocks recursively
+  retrieveChildrenBlocksRecursively(
+    blockId: string
+  ): Promise<BlockObjectResponse[]>;
+
+  // extract plain text from blocks
+  extractPlainText(blocks: ListBlockChildrenResponse): string;
 }
 
 class NotionClientImpl implements NotionClient {
@@ -98,18 +109,144 @@ class NotionClientImpl implements NotionClient {
     return allDatabases;
   }
 
-  async pageDetails(pageId: string): Promise<GetPageResponse> {
-    const response = await this.client.pages.retrieve({ page_id: pageId });
+  async pageDetails(pageId: string): Promise<ListBlockChildrenResponse> {
+    let allBlocks: Array<BlockObjectResponse | PartialBlockObjectResponse> = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
 
-    const pageContent = await this.client.blocks.children.list({
-      block_id: pageId,
-      page_size: 100,
+    while (hasMore) {
+      const response = await this.client.blocks.children.list({
+        block_id: pageId,
+        start_cursor: startCursor,
+        page_size: 100,
+      });
+
+      for (const block of response.results) {
+        allBlocks.push(block);
+        if ("has_children" in block && block.has_children) {
+          const childrenBlocks = await this.retrieveChildrenBlocksRecursively(
+            block.id
+          );
+          allBlocks = allBlocks.concat(childrenBlocks);
+        }
+      }
+
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    const completeResponse: ListBlockChildrenResponse = {
+      type: "block",
+      block: {},
+      object: "list",
+      next_cursor: "",
+      has_more: false,
+      results: allBlocks,
+    };
+
+    return completeResponse;
+  }
+
+  async retrieveChildrenBlocksRecursively(
+    blockId: string
+  ): Promise<BlockObjectResponse[]> {
+    let allBlocks: BlockObjectResponse[] = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
+
+    while (hasMore) {
+      const response = await this.client.blocks.children.list({
+        block_id: blockId,
+        start_cursor: startCursor,
+        page_size: 100,
+      });
+
+      for (const block of response.results) {
+        if ("type" in block) {
+          allBlocks.push(block as BlockObjectResponse);
+          if ("has_children" in block && block.has_children) {
+            const childrenBlocks = await this.retrieveChildrenBlocksRecursively(
+              block.id
+            );
+            if (childrenBlocks.length > 0) {
+              allBlocks = allBlocks.concat(childrenBlocks);
+            }
+          }
+        }
+      }
+
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    return allBlocks;
+  }
+
+  extractPlainText(blocks: ListBlockChildrenResponse): string {
+    if (blocks.results.length == 0) {
+      return "";
+    }
+
+    let text = "";
+    blocks.results.forEach((block) => {
+      if ("type" in block) {
+        const blockObject = block as BlockObjectResponse;
+        switch (blockObject.type) {
+          case "paragraph":
+            text += blockObject.paragraph.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "heading_1":
+            text += blockObject.heading_1.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "heading_2":
+            text += blockObject.heading_2.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "heading_3":
+            text += blockObject.heading_3.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "bulleted_list_item":
+            text += blockObject.bulleted_list_item.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "numbered_list_item":
+            text += blockObject.numbered_list_item.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "quote":
+            text += blockObject.quote.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+          case "to_do":
+            text += blockObject.to_do.rich_text
+              .map((text) => text.plain_text)
+              .join("");
+            text += "\n";
+            break;
+        }
+      } else {
+        //const blockObject = block as PartialBlockObjectResponse;
+      }
     });
 
-    console.log("Page Content:");
-    console.log(pageContent);
-    console.log("Page Content End");
-    return response;
+    return text;
   }
 }
 
