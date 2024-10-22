@@ -7,8 +7,8 @@ import {
   BlockObjectResponse,
   PartialBlockObjectResponse,
   QueryDatabaseResponse,
-  PartialDatabaseObjectResponse,
   PartialPageObjectResponse,
+  GetPageResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 
 const DEFAULT_PAGE_SIZE = 100;
@@ -23,22 +23,20 @@ interface NotionClient {
   // get page details
   pageDetails(pageId: string): Promise<ListBlockChildrenResponse>;
   // get all pages from a database
-  allPagesFromDatabase(
-    databaseId: string
-  ): Promise<
-    Array<
-      | PageObjectResponse
-      | PartialPageObjectResponse
-      | PartialDatabaseObjectResponse
-      | DatabaseObjectResponse
-    >
-  >;
+  allPagesFromDatabase(databaseId: string): Promise<Array<PageObjectResponse>>;
+
   // retrieve children blocks recursively
   retrieveChildrenBlocksRecursively(
     blockId: string
   ): Promise<BlockObjectResponse[]>;
+
   // extract plain text from blocks of a page
   extractPlainTextFromPage(blocks: ListBlockChildrenResponse): string;
+
+  // convert partial page to page object
+  convertPartialPageToPage(
+    partialPage: PartialPageObjectResponse
+  ): Promise<PageObjectResponse>;
 }
 
 class NotionClientImpl implements NotionClient {
@@ -162,20 +160,8 @@ class NotionClientImpl implements NotionClient {
 
   async allPagesFromDatabase(
     databaseId: string
-  ): Promise<
-    Array<
-      | PageObjectResponse
-      | PartialPageObjectResponse
-      | PartialDatabaseObjectResponse
-      | DatabaseObjectResponse
-    >
-  > {
-    let allPages: Array<
-      | PageObjectResponse
-      | PartialPageObjectResponse
-      | PartialDatabaseObjectResponse
-      | DatabaseObjectResponse
-    > = [];
+  ): Promise<Array<PageObjectResponse>> {
+    let allPages: Array<PageObjectResponse> = [];
     let hasMore = true;
     let startCursor: string | undefined = undefined;
 
@@ -188,7 +174,15 @@ class NotionClientImpl implements NotionClient {
         }
       );
 
-      allPages = allPages.concat(response.results);
+      response.results.forEach(async (result) => {
+        if (result.object === "page" && "properties" in result) {
+          allPages.push(result as PageObjectResponse);
+        } else if (result.object === "page") {
+          const page = await this.convertPartialPageToPage(result);
+          allPages.push(page);
+        }
+      });
+
       hasMore = response.has_more;
       startCursor = response.next_cursor ?? undefined;
     }
@@ -296,6 +290,20 @@ class NotionClientImpl implements NotionClient {
     });
 
     return text;
+  }
+
+  async convertPartialPageToPage(
+    partialPage: PartialPageObjectResponse
+  ): Promise<PageObjectResponse> {
+    const response: GetPageResponse = await this.client.pages.retrieve({
+      page_id: partialPage.id,
+    });
+
+    if (response.object === "page") {
+      return response as PageObjectResponse;
+    }
+
+    throw new Error("Failed to convert partial page to page");
   }
 }
 
