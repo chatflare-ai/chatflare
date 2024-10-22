@@ -3,11 +3,15 @@ import {
   PageObjectResponse,
   DatabaseObjectResponse,
   SearchResponse,
-  GetPageResponse,
   ListBlockChildrenResponse,
   BlockObjectResponse,
   PartialBlockObjectResponse,
+  QueryDatabaseResponse,
+  PartialDatabaseObjectResponse,
+  PartialPageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+
+const DEFAULT_PAGE_SIZE = 100;
 
 interface NotionClient {
   // get all documents from notion
@@ -18,14 +22,23 @@ interface NotionClient {
   allDatabases(): Promise<DatabaseObjectResponse[]>;
   // get page details
   pageDetails(pageId: string): Promise<ListBlockChildrenResponse>;
-
+  // get all pages from a database
+  allPagesFromDatabase(
+    databaseId: string
+  ): Promise<
+    Array<
+      | PageObjectResponse
+      | PartialPageObjectResponse
+      | PartialDatabaseObjectResponse
+      | DatabaseObjectResponse
+    >
+  >;
   // retrieve children blocks recursively
   retrieveChildrenBlocksRecursively(
     blockId: string
   ): Promise<BlockObjectResponse[]>;
-
-  // extract plain text from blocks
-  extractPlainText(blocks: ListBlockChildrenResponse): string;
+  // extract plain text from blocks of a page
+  extractPlainTextFromPage(blocks: ListBlockChildrenResponse): string;
 }
 
 class NotionClientImpl implements NotionClient {
@@ -147,6 +160,42 @@ class NotionClientImpl implements NotionClient {
     return completeResponse;
   }
 
+  async allPagesFromDatabase(
+    databaseId: string
+  ): Promise<
+    Array<
+      | PageObjectResponse
+      | PartialPageObjectResponse
+      | PartialDatabaseObjectResponse
+      | DatabaseObjectResponse
+    >
+  > {
+    let allPages: Array<
+      | PageObjectResponse
+      | PartialPageObjectResponse
+      | PartialDatabaseObjectResponse
+      | DatabaseObjectResponse
+    > = [];
+    let hasMore = true;
+    let startCursor: string | undefined = undefined;
+
+    while (hasMore) {
+      const response: QueryDatabaseResponse = await this.client.databases.query(
+        {
+          database_id: databaseId,
+          start_cursor: startCursor,
+          page_size: DEFAULT_PAGE_SIZE,
+        }
+      );
+
+      allPages = allPages.concat(response.results);
+      hasMore = response.has_more;
+      startCursor = response.next_cursor ?? undefined;
+    }
+
+    return allPages;
+  }
+
   async retrieveChildrenBlocksRecursively(
     blockId: string
   ): Promise<BlockObjectResponse[]> {
@@ -182,7 +231,7 @@ class NotionClientImpl implements NotionClient {
     return allBlocks;
   }
 
-  extractPlainText(blocks: ListBlockChildrenResponse): string {
+  extractPlainTextFromPage(blocks: ListBlockChildrenResponse): string {
     if (blocks.results.length == 0) {
       return "";
     }
